@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkTrack — Chấm Công & Chi Tiêu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon">⏱️</span>
+        <span class="logo-text">WorkTrack</span>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-tab="dashboard">📊 Tổng quan</button>
+        <button class="nav-btn" data-tab="attendance">🕐 Chấm công</button>
+        <button class="nav-btn" data-tab="expense">💰 Chi tiêu</button>
+        <button class="nav-btn" data-tab="report">📈 Báo cáo</button>
+        <button class="nav-btn" data-tab="settings">⚙️ Cài đặt</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <div class="header-left">
+          <h1 id="page-title">Tổng quan</h1>
+          <p id="current-date"></p>
+        </div>
+        <div class="header-right">
+          <div class="clock" id="live-clock"></div>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section id="tab-dashboard" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+              <p class="stat-label">Ngày công tháng này</p>
+              <p class="stat-value" id="stat-days">0</p>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-info">
+              <p class="stat-label">Tổng giờ làm</p>
+              <p class="stat-value" id="stat-hours">0h</p>
+            </div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon">💸</div>
+            <div class="stat-info">
+              <p class="stat-label">Chi tiêu tháng này</p>
+              <p class="stat-value" id="stat-expense">0đ</p>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon">💵</div>
+            <div class="stat-info">
+              <p class="stat-label">Thu nhập ước tính</p>
+              <p class="stat-value" id="stat-income">0đ</p>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="card">
+            <h3>Chấm công gần đây</h3>
+            <table class="table" id="recent-attendance">
+              <thead><tr><th>Ngày</th><th>Giờ làm</th><th>Thu nhập</th><th>Trạng thái</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Chi tiêu gần đây</h3>
+            <table class="table" id="recent-expense">
+              <thead><tr><th>Ngày</th><th>Danh mục</th><th>Mô tả</th><th>Số tiền</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ATTENDANCE -->
+      <section id="tab-attendance" class="tab-content">
+        <div class="attendance-top">
+          <div class="card wage-card">
+            <h3>💵 Mức lương theo giờ</h3>
+            <div class="wage-presets">
+              <button class="wage-btn" data-wage="20000">20.000đ</button>
+              <button class="wage-btn" data-wage="25000">25.000đ</button>
+              <button class="wage-btn" data-wage="30000">30.000đ</button>
+              <button class="wage-btn" data-wage="40000">40.000đ</button>
+              <button class="wage-btn" data-wage="50000">50.000đ</button>
+              <button class="wage-btn" data-wage="60000">60.000đ</button>
+            </div>
+            <div class="form-group" style="margin-top:12px">
+              <label>Hoặc nhập mức lương tuỳ chỉnh (đ/giờ)</label>
+              <input type="number" id="wage-custom" class="input" placeholder="Nhập số tiền..." min="0" />
+            </div>
+            <div class="wage-current">Lương hiện tại: <strong id="wage-display">Chưa đặt</strong></div>
+            <p style="margin-top:16px;font-size:13px;color:var(--text2)">👆 Click vào ngày trên lịch bên dưới để chấm công</p>
+          </div>
+          <div class="card att-summary-card">
+            <h3>📊 Tổng hợp tháng này</h3>
+            <div class="att-summary-grid">
+              <div class="att-sum-item blue"><span class="att-sum-label">Ngày đi làm</span><span class="att-sum-val" id="sum-days">0</span></div>
+              <div class="att-sum-item green"><span class="att-sum-label">Tổng giờ làm</span><span class="att-sum-val" id="sum-hours">0h</span></div>
+              <div class="att-sum-item red"><span class="att-sum-label">Ngày OFF</span><span class="att-sum-val" id="sum-off">0</span></div>
+              <div class="att-sum-item purple"><span class="att-sum-label">Tổng thu nhập</span><span class="att-sum-val" id="sum-income">0đ</span></div>
+            </div>
+            <div class="att-sum-detail">
+              <div class="att-sum-row"><span>Giờ TB / ngày</span><strong id="sum-avg">—</strong></div>
+              <div class="att-sum-row"><span>Tăng ca</span><strong id="sum-overtime">0 ngày</strong></div>
+              <div class="att-sum-row"><span>Lương / giờ hiện tại</span><strong id="sum-wage">—</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>📆 Lịch làm việc</h3>
+            <div class="filter-row">
+              <input type="month" id="attendance-month-filter" class="input input-sm" />
+              <button class="btn btn-sm btn-outline" id="btn-export-attendance">📥 Xuất JSON</button>
+            </div>
+          </div>
+          <div id="att-calendar"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Lịch sử chấm công</h3>
+            <span id="att-month-summary" style="font-size:13px;color:var(--text2)"></span>
+          </div>
+          <table class="table" id="attendance-table">
+            <thead>
+              <tr><th>Ngày</th><th>Thứ</th><th>Giờ làm</th><th>Lương/giờ</th><th>Thu nhập</th><th>Trạng thái</th><th>Ghi chú</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EXPENSE -->
+      <section id="tab-expense" class="tab-content">
+        <div class="expense-top">
+          <div class="card">
+            <h3>Thêm chi tiêu</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ngày</label>
+                <input type="date" id="expense-date" class="input" />
+              </div>
+              <div class="form-group">
+                <label>Danh mục</label>
+                <select id="expense-category" class="input">
+                  <option value="food">🍜 Ăn uống</option>
+                  <option value="transport">🚗 Di chuyển</option>
+                  <option value="shopping">🛍️ Mua sắm</option>
+                  <option value="health">💊 Sức khoẻ</option>
+                  <option value="entertainment">🎮 Giải trí</option>
+                  <option value="bill">📄 Hoá đơn</option>
+                  <option value="other">📦 Khác</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Mô tả</label>
+              <input type="text" id="expense-desc" class="input" placeholder="Mô tả chi tiêu..." />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Số tiền (đ)</label>
+                <input type="number" id="expense-amount" class="input" placeholder="0" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Loại</label>
+                <select id="expense-type" class="input">
+                  <option value="expense">Chi tiêu</option>
+                  <option value="income">Thu nhập</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-add-expense">Thêm</button>
+          </div>
+          <div class="card expense-summary">
+            <h3>Tóm tắt tháng này</h3>
+            <div class="summary-item income"><span>💚 Thu nhập</span><strong id="summary-income">0đ</strong></div>
+            <div class="summary-item expense"><span>❤️ Chi tiêu</span><strong id="summary-expense-total">0đ</strong></div>
+            <div class="summary-divider"></div>
+            <div class="summary-item balance"><span>💰 Số dư</span><strong id="summary-balance">0đ</strong></div>
+            <div class="category-breakdown" id="category-breakdown"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Lịch sử chi tiêu</h3>
+            <div class="filter-row">
+              <input type="month" id="expense-month-filter" class="input input-sm" />
+              <select id="expense-cat-filter" class="input input-sm">
+                <option value="">Tất cả danh mục</option>
+                <option value="food">Ăn uống</option>
+                <option value="transport">Di chuyển</option>
+                <option value="shopping">Mua sắm</option>
+                <option value="health">Sức khoẻ</option>
+                <option value="entertainment">Giải trí</option>
+                <option value="bill">Hoá đơn</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+          </div>
+          <table class="table" id="expense-table">
+            <thead><tr><th>Ngày</th><th>Danh mục</th><th>Mô tả</th><th>Loại</th><th>Số tiền</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REPORT -->
+      <section id="tab-report" class="tab-content">
+        <div class="filter-row mb">
+          <label>Tháng báo cáo:</label>
+          <input type="month" id="report-month" class="input input-sm" />
+          <button class="btn btn-primary btn-sm" id="btn-gen-report">Tạo báo cáo</button>
+        </div>
+        <div class="report-grid">
+          <div class="card"><h3>📅 Chấm công</h3><div class="report-stats" id="report-attendance-stats"></div></div>
+          <div class="card"><h3>💰 Chi tiêu</h3><div class="report-stats" id="report-expense-stats"></div></div>
+        </div>
+        <div class="card"><h3>Chi tiêu theo danh mục</h3><div class="chart-container" id="chart-container"></div></div>
+        <div class="card"><h3>Chấm công theo tuần</h3><div class="bar-chart" id="weekly-chart"></div></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="tab-settings" class="tab-content">
+        <div class="settings-grid">
+          <div class="card">
+            <h3>⚙️ Cài đặt làm việc</h3>
+            <div class="form-group">
+              <label>Tên của bạn</label>
+              <input type="text" id="setting-name" class="input" placeholder="Tên của bạn" />
+            </div>
+            <div class="form-group">
+              <label>Lương theo giờ (đ)</label>
+              <input type="number" id="setting-wage" class="input" placeholder="0" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Ngân sách chi tiêu/tháng (đ)</label>
+              <input type="number" id="setting-budget" class="input" placeholder="0" min="0" />
+            </div>
+            <button class="btn btn-primary" id="btn-save-settings">Lưu cài đặt</button>
+          </div>
+          <div class="card">
+            <h3>💾 Dữ liệu</h3>
+            <p class="text-muted">Dữ liệu lưu trong trình duyệt của bạn (localStorage). Mỗi người dùng có dữ liệu riêng.</p>
+            <div class="data-actions">
+              <button class="btn btn-outline" id="btn-export-all">📤 Xuất dữ liệu (JSON)</button>
+              <label class="btn btn-outline" for="import-file">📥 Nhập dữ liệu (JSON)</label>
+              <input type="file" id="import-file" accept=".json" style="display:none" />
+              <button class="btn btn-danger" id="btn-clear-data">🗑️ Xoá toàn bộ dữ liệu</button>
+            </div>
+            <div class="storage-info" id="storage-info"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
